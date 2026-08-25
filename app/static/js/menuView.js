@@ -204,23 +204,23 @@ export class MenuView {
 
       const s = shifts[shiftKey];
       html += `
-        <div class="menu-shift-section" style="margin-bottom: 28px;">
-          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--border-subtle); padding-bottom:6px; flex-wrap:wrap; gap:8px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <h3 style="font-family:var(--font-display); font-size:17px; font-weight:700; color:var(--text-primary); margin:0;">
+        <div class="menu-shift-section">
+          <div class="menu-shift-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <h3 style="font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--text-primary); margin:0;">
                 ${s.name}
               </h3>
-              <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-secondary); background:var(--bg-chalkboard); padding:2px 7px; border-radius:4px; border:1px solid var(--border-subtle);">
+              <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-secondary); background:var(--bg-chalkboard); padding:3px 9px; border-radius:4px; border:1px solid var(--border-subtle);">
                 ${s.time_slot}
               </span>
             </div>
 
-            <div style="font-family:var(--font-mono); font-size:12px; color:var(--accent-copper);">
+            <div style="font-family:var(--font-mono); font-size:12.5px; color:var(--accent-copper);">
               Shift Projected Covers: <b>~${s.predicted_covers} diners</b>
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(310px, 1fr)); gap:14px;">
+          <div class="dishes-grid">
             ${s.items.map(dish => this.renderDishCard(dish)).join('')}
           </div>
         </div>
@@ -241,7 +241,7 @@ export class MenuView {
     const st = statusMap[dish.status] || statusMap.ready;
 
     return `
-      <div class="dish-card" data-id="${dish.id}" style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:10px; box-shadow:var(--shadow-card); transition:border-color var(--transition-fast);">
+      <div class="dish-card" data-id="${dish.id}">
         <div>
           <!-- TOP ROW: TITLE & DIETARY BADGE -->
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px;">

@@ -1014,4 +1014,54 @@
     right: -100vw;
     border-left: none;
   }
+  .dishes-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .menu-shift-section {
+    margin-bottom: 26px !important;
+  }
+}
+
+/* ========================================================
+   MENU SECTION & DISH CARDS
+   ======================================================== */
+.menu-shift-section {
+  margin-bottom: 36px;
+}
+
+.menu-shift-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+}
+
+.dish-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.dish-card:hover {
+  border-color: rgba(201, 113, 61, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
 }
