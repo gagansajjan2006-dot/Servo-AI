@@ -123,3 +123,16 @@ def test_add_menu_item():
     assert post_res.json()["status"] == "success"
     assert "id" in post_res.json()
 
+def test_serve_index_html():
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "Servo AI" in res.text or "<html" in res.text
+
+def test_vercel_entrypoint():
+    from api.index import app as vercel_app
+    vclient = TestClient(vercel_app)
+    res = vclient.get("/api/health")
+    assert res.status_code == 200
+    assert res.json()["status"] == "healthy"
+
+

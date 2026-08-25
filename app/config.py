@@ -5,16 +5,40 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# Detect serverless / cloud function runtime (Vercel, AWS Lambda, etc.)
+IS_SERVERLESS = bool(
+    os.environ.get("VERCEL")
+    or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+    or os.environ.get("NOW_REGION")
+    or os.environ.get("LAMBDA_TASK_ROOT")
+)
+
+if IS_SERVERLESS:
+    DATA_DIR = Path("/tmp/servo_ai_data")
+else:
+    DATA_DIR = BASE_DIR / "data"
+
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except (OSError, PermissionError):
+    # Fallback to /tmp if local filesystem is read-only
+    DATA_DIR = Path("/tmp/servo_ai_data")
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 DB_PATH = DATA_DIR / "servo_ai.db"
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
 # Model configuration
 MODEL_DIR = DATA_DIR / "models"
-MODEL_DIR.mkdir(parents=True, exist_ok=True)
+try:
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+except (OSError, PermissionError):
+    MODEL_DIR = Path("/tmp/servo_ai_data/models")
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+
 MODEL_FILE = MODEL_DIR / "demand_forecaster.joblib"
+BUNDLED_MODEL_FILE = BASE_DIR / "data" / "models" / "demand_forecaster.joblib"
 
 # Default Campus Dining & Kitchen Settings
 CANTEEN_SETTINGS = {

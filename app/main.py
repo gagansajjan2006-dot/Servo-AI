@@ -25,17 +25,34 @@ from app.services.prediction_service import prediction_service
 from app.services.assistant_service import assistant_service
 from app.services.menu_service import menu_service
 
+from pathlib import Path
+
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+_db_initialized = False
+
+def ensure_initialized():
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            init_db()
+            seed_database()
+            db = next(get_db())
+            try:
+                if not forecaster._is_fitted:
+                    forecaster.train_on_records(db)
+            except Exception as e:
+                print(f"Warning during model init: {e}")
+            finally:
+                db.close()
+        except Exception as e:
+            print(f"Warning during database init: {e}")
+        _db_initialized = True
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    init_db()
-    seed_database()
-    db = next(get_db())
-    try:
-        if not forecaster._is_fitted:
-            forecaster.train_on_records(db)
-    finally:
-        db.close()
+    ensure_initialized()
     yield
     # Shutdown
 
@@ -45,6 +62,12 @@ app = FastAPI(
     version="3.0.0",
     lifespan=lifespan
 )
+
+@app.middleware("http")
+async def db_init_middleware(request, call_next):
+    if not _db_initialized:
+        ensure_initialized()
+    return await call_next(request)
 
 app.add_middleware(
     CORSMiddleware,
@@ -452,9 +475,13 @@ def export_sales_csv(db: Session = Depends(get_db)):
     )
 
 # ----------------- STATIC FILES MOUNTING -----------------
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 def serve_index():
-    with open("app/static/index.html", "r", encoding="utf-8") as f:
-        return f.read()
+    index_file = STATIC_DIR / "index.html"
+    if index_file.exists():
+        with open(index_file, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>🔥 Servo AI API is Running</h1>"

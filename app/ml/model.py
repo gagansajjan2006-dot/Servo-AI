@@ -12,7 +12,7 @@ from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegresso
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sqlalchemy.orm import Session
 
-from app.config import MODEL_FILE
+from app.config import MODEL_FILE, BUNDLED_MODEL_FILE
 from app.database import DailyRecord, ModelTrainingLog, SessionLocal
 from app.ml.features import FEATURE_COLUMNS, engineer_features_df, build_single_day_features
 from app.ml.explainability import generate_reason_chips
@@ -30,19 +30,21 @@ class CanteenDemandForecaster:
 
     def load_or_initialize(self):
         """Loads saved models if available, otherwise initializes clean estimators."""
-        if MODEL_FILE.exists():
-            try:
-                bundle = joblib.load(MODEL_FILE)
-                self.model_mean = bundle.get("model_mean")
-                self.model_lower = bundle.get("model_lower")
-                self.model_upper = bundle.get("model_upper")
-                self.feature_importances = bundle.get("feature_importances", {})
-                self.last_trained = bundle.get("last_trained")
-                self.metrics = bundle.get("metrics", {})
-                self._is_fitted = True
-                return
-            except Exception as e:
-                print(f"Warning: could not load existing model: {e}")
+        candidate_files = [MODEL_FILE, BUNDLED_MODEL_FILE]
+        for fpath in candidate_files:
+            if fpath and fpath.exists():
+                try:
+                    bundle = joblib.load(fpath)
+                    self.model_mean = bundle.get("model_mean")
+                    self.model_lower = bundle.get("model_lower")
+                    self.model_upper = bundle.get("model_upper")
+                    self.feature_importances = bundle.get("feature_importances", {})
+                    self.last_trained = bundle.get("last_trained")
+                    self.metrics = bundle.get("metrics", {})
+                    self._is_fitted = True
+                    return
+                except Exception as e:
+                    print(f"Warning: could not load existing model from {fpath}: {e}")
                 
         # Default fresh estimators
         self.model_mean = HistGradientBoostingRegressor(
@@ -135,7 +137,10 @@ class CanteenDemandForecaster:
                 "last_trained": self.last_trained,
                 "metrics": self.metrics
             }
-            joblib.dump(bundle, MODEL_FILE)
+            try:
+                joblib.dump(bundle, MODEL_FILE)
+            except Exception as e:
+                print(f"Warning: could not save model file: {e}")
             
             # Save training log to DB
             log_entry = ModelTrainingLog(
