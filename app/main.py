@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Optional
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, Query, UploadFile, File, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -37,7 +37,7 @@ def ensure_initialized():
         try:
             init_db()
             seed_database()
-            db = next(get_db())
+            db = SessionLocal()
             try:
                 if not forecaster._is_fitted:
                     forecaster.train_on_records(db)
@@ -477,6 +477,11 @@ def export_sales_csv(db: Session = Depends(get_db)):
 # ----------------- STATIC FILES MOUNTING -----------------
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+@app.get("/favicon.ico", include_in_schema=False)
+@app.get("/favicon.png", include_in_schema=False)
+async def favicon():
+    return Response(status_code=204)
 
 @app.get("/", response_class=HTMLResponse)
 def serve_index():

@@ -131,10 +131,13 @@ export class TelemetrySocket {
   constructor(onMessage) {
     this.onMessage = onMessage;
     this.ws = null;
+    this.retryCount = 0;
+    this.maxRetries = 3;
     this.connect();
   }
 
   connect() {
+    if (this.retryCount >= this.maxRetries) return;
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws/live`;
     
@@ -142,6 +145,7 @@ export class TelemetrySocket {
       this.ws = new WebSocket(wsUrl);
       
       this.ws.onopen = () => {
+        this.retryCount = 0;
         console.log('📡 Connected to Servo AI Live Telemetry WebSocket');
       };
       
@@ -155,8 +159,14 @@ export class TelemetrySocket {
       };
       
       this.ws.onclose = () => {
-        // Reconnect after 3s
-        setTimeout(() => this.connect(), 3000);
+        this.retryCount++;
+        if (this.retryCount < this.maxRetries) {
+          setTimeout(() => this.connect(), 5000);
+        }
+      };
+
+      this.ws.onerror = () => {
+        this.ws?.close();
       };
     } catch (e) {
       console.warn('WebSocket connection fallback:', e);
