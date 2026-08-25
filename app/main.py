@@ -6,7 +6,7 @@ import csv
 from datetime import date, datetime, timedelta
 from typing import List, Dict, Any, Optional
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException, Query, UploadFile, File, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Depends, HTTPException, Query, UploadFile, File, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import CANTEEN_SETTINGS, STATIONS
 from app.database import (
-    init_db, get_db, DailyRecord, AcademicCalendar, RecipeRatio, ManagerCorrection, ModelTrainingLog, MenuItem
+    init_db, get_db, SessionLocal, DailyRecord, AcademicCalendar, RecipeRatio, ManagerCorrection, ModelTrainingLog, MenuItem
 )
 from app.seed_data import seed_database
 from app.ml.model import forecaster
@@ -156,12 +156,16 @@ class RecipeRatioRequest(BaseModel):
 
 # ----------------- REST ENDPOINTS -----------------
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.get("/api/health")
-def health_check():
+def api_health():
     return {
-        "status": "healthy",
-        "service": "Canteen Pulse Command Engine",
-        "version": "2.4.0",
+        "status": "ok",
+        "service": "Servo AI Command Engine",
+        "version": "3.0.0",
         "timestamp": datetime.now().isoformat()
     }
 
@@ -483,10 +487,23 @@ if STATIC_DIR.exists():
 async def favicon():
     return Response(status_code=204)
 
-@app.get("/", response_class=HTMLResponse)
-def serve_index():
-    index_file = STATIC_DIR / "index.html"
-    if index_file.exists():
-        with open(index_file, "r", encoding="utf-8") as f:
-            return f.read()
-    return "<h1>🔥 Servo AI API is Running</h1>"
+@app.get("/")
+@app.get("/api/index.py")
+@app.get("/api")
+def serve_root(request: Request):
+    accept = request.headers.get("accept", "")
+    format_param = request.query_params.get("format", "")
+    
+    # If explicitly requesting JSON
+    if format_param == "json" or ("application/json" in accept and "text/html" not in accept):
+        return {"message": "Servo AI API is running"}
+    
+    # If browser is requesting HTML
+    if "text/html" in accept:
+        index_file = STATIC_DIR / "index.html"
+        if index_file.exists():
+            with open(index_file, "r", encoding="utf-8") as f:
+                return HTMLResponse(content=f.read(), status_code=200)
+                
+    # Default API response
+    return {"message": "Servo AI API is running"}

@@ -12,10 +12,15 @@ client = TestClient(app)
 def test_startup_and_health():
     init_db()
     seed_database()
-    res = client.get("/api/health")
+    res = client.get("/health")
     assert res.status_code == 200
     data = res.json()
-    assert data["status"] == "healthy"
+    assert data == {"status": "ok"}
+
+    api_res = client.get("/api/health")
+    assert api_res.status_code == 200
+    api_data = api_res.json()
+    assert api_data["status"] == "ok"
 
 def test_today_prediction():
     res = client.get("/api/predict/today")
@@ -123,16 +128,29 @@ def test_add_menu_item():
     assert post_res.json()["status"] == "success"
     assert "id" in post_res.json()
 
-def test_serve_index_html():
-    res = client.get("/")
+def test_serve_root_json():
+    res = client.get("/", headers={"Accept": "application/json"})
+    assert res.status_code == 200
+    assert res.json() == {"message": "Servo AI API is running"}
+
+def test_serve_root_html():
+    res = client.get("/", headers={"Accept": "text/html"})
     assert res.status_code == 200
     assert "Servo AI" in res.text or "<html" in res.text
 
 def test_vercel_entrypoint():
     from api.index import app as vercel_app
     vclient = TestClient(vercel_app)
-    res = vclient.get("/api/health")
+    res = vclient.get("/health")
     assert res.status_code == 200
-    assert res.json()["status"] == "healthy"
+    assert res.json() == {"status": "ok"}
+
+    res_root = vclient.get("/", headers={"Accept": "application/json"})
+    assert res_root.status_code == 200
+    assert res_root.json() == {"message": "Servo AI API is running"}
+
+    res_api_index = vclient.get("/api/index.py", headers={"Accept": "application/json"})
+    assert res_api_index.status_code == 200
+    assert res_api_index.json() == {"message": "Servo AI API is running"}
 
 
