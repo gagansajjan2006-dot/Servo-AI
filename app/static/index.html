@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Servo AI — Steam & Ledger Campus Dining Demand Forecaster & Kitchen Logbook">
+  <meta name="theme-color" content="#1C1A17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Servo AI — Kitchen Demand Forecaster & Ledger</title>
+
+  <!-- SVG Favicon: The Servo Steam Mark -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Cpath d='M5 22C5 27 27 27 27 22' stroke='%23F2ECE3' stroke-width='2.2' stroke-linecap='round'/%3E%3Cpath d='M10 27L22 27' stroke='%23F2ECE3' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M21 7C19 4.5 13 4.5 12 7.5C11 11 21 12 20 15.5C19 18.5 13 18.5 11 16' stroke='%23C9713D' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts: Fraunces (Serif Display), IBM Plex Sans, IBM Plex Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Modular CSS Design System ("Steam & Ledger") -->
+  <link rel="stylesheet" href="/static/css/variables.css">
+  <link rel="stylesheet" href="/static/css/layout.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/heatmap.css">
+</head>
+<body>
+
+  <div id="app-root">
+    <!-- TOP STATUS & SERVICE BAR -->
+    <header class="command-header">
+      <div class="brand-section">
+        <!-- The Servo Steam Mark SVG Monogram -->
+        <div class="brand-logo-wrap" title="Servo AI Steam Mark">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 5 22 C 5 27, 27 27, 27 22" stroke="#F2ECE3" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 10 27 L 22 27" stroke="#F2ECE3" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 21 7 C 19 4.5, 13 4.5, 12 7.5 C 11 11, 21 12, 20 15.5 C 19 18.5, 13 18.5, 11 16" stroke="#C9713D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 16 19 L 16 21" stroke="#C9713D" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+
+        <div class="brand-titles">
+          <h1>
+            <span class="wordmark-canteen">SERVO</span>
+            <span class="wordmark-pulse">AI</span>
+          </h1>
+          <div class="brand-subtitle">Campus Dining Ledger & Kitchen Forecaster</div>
+        </div>
+      </div>
+
+      <!-- DESKTOP SLIM UNDERLINE TAB STRIP -->
+      <nav class="nav-tabs-wrapper" aria-label="Main Navigation">
+        <button class="nav-tab-btn active" data-view="today" id="tab-today">
+          <i data-lucide="book-open"></i>
+          <span>Today's Ledger</span>
+        </button>
+        <button class="nav-tab-btn" data-view="menu" id="tab-menu">
+          <i data-lucide="utensils-crossed"></i>
+          <span>Daily Menu</span>
+        </button>
+        <button class="nav-tab-btn" data-view="forecast" id="tab-forecast">
+          <i data-lucide="calendar"></i>
+          <span>14-Day Outlook</span>
+        </button>
+        <button class="nav-tab-btn" data-view="history" id="tab-history">
+          <i data-lucide="bar-chart-3"></i>
+          <span>History & Accuracy</span>
+        </button>
+        <button class="nav-tab-btn" data-view="procurement" id="tab-procurement">
+          <i data-lucide="clipboard-list"></i>
+          <span>Pantry & Recipes</span>
+        </button>
+        <button class="nav-tab-btn" data-view="admin" id="tab-admin">
+          <i data-lucide="sliders-horizontal"></i>
+          <span>Model Workbench</span>
+        </button>
+      </nav>
+
+      <!-- RIGHT HEADER ACTIONS -->
+      <div class="header-actions">
+        <div class="live-indicator">
+          <div class="live-dot"></div>
+          <span>Live Feed</span>
+        </div>
+
+        <button class="btn-kitchen-mode" id="btn-toggle-kitchen-mode" title="Toggle Kitchen Display Board">
+          <i data-lucide="tv"></i>
+          <span>Board View</span>
+        </button>
+
+        <button class="btn-ai-assistant-toggle" id="btn-toggle-assistant">
+          <i data-lucide="sparkles"></i>
+          <span>Ask Assistant</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="main-container">
+      <!-- 1. TODAY COMMAND CENTER VIEW -->
+      <section id="view-today" class="view-section active"></section>
+
+      <!-- 2. DEDICATED MENU VIEW -->
+      <section id="view-menu" class="view-section"></section>
+
+      <!-- 3. 14-DAY FORECAST OUTLOOK VIEW -->
+      <section id="view-forecast" class="view-section"></section>
+
+      <!-- 4. HISTORY & ACCURACY SCOREBOARD VIEW -->
+      <section id="view-history" class="view-section"></section>
+
+      <!-- 5. PROCUREMENT & RECIPE MATRIX VIEW -->
+      <section id="view-procurement" class="view-section"></section>
+
+      <!-- 6. ADMIN & RETRAIN WORKBENCH VIEW -->
+      <section id="view-admin" class="view-section"></section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div>
+        <b>Servo AI</b> • Steam & Ledger Forecaster • Tech & Engineering Campus
+      </div>
+      <div>
+        <span style="font-family: var(--font-mono); font-size: 11.5px;">Campus Base: 4,650 • Model: GBDT Ensemble</span>
+      </div>
+    </footer>
+
+    <!-- MOBILE PHONE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+      <button class="mobile-nav-item active" data-view="today" id="mob-nav-today">
+        <i data-lucide="book-open"></i>
+        <span>Today</span>
+      </button>
+      <button class="mobile-nav-item" data-view="menu" id="mob-nav-menu">
+        <i data-lucide="utensils-crossed"></i>
+        <span>Menu</span>
+      </button>
+      <button class="mobile-nav-item" data-view="forecast" id="mob-nav-forecast">
+        <i data-lucide="calendar"></i>
+        <span>Outlook</span>
+      </button>
+      <button class="mobile-nav-item" data-view="history" id="mob-nav-history">
+        <i data-lucide="bar-chart-3"></i>
+        <span>History</span>
+      </button>
+      <button class="mobile-nav-item" data-view="procurement" id="mob-nav-procurement">
+        <i data-lucide="clipboard-list"></i>
+        <span>Pantry</span>
+      </button>
+      <button class="mobile-nav-item" id="mob-nav-assistant">
+        <i data-lucide="sparkles"></i>
+        <span>AI Chat</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- PERSISTENT AI KITCHEN ASSISTANT SLIDE DRAWER / PHONE SHEET -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="ai-assistant-drawer" id="ai-assistant-drawer" aria-label="Servo AI Kitchen Assistant Drawer">
+    <div class="drawer-header">
+      <div class="drawer-title-box">
+        <div class="drawer-avatar">
+          <svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 5 22 C 5 27, 27 27, 27 22" stroke="#F2ECE3" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M 10 27 L 22 27" stroke="#F2ECE3" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 21 7 C 19 4.5, 13 4.5, 12 7.5 C 11 11, 21 12, 20 15.5 C 19 18.5, 13 18.5, 11 16" stroke="#C9713D" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div style="font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--text-primary);">Servo AI Assistant</div>
+          <div style="font-size: 11px; color: var(--color-sage);">● Grounded in Model & Recipe Ledger</div>
+        </div>
+      </div>
+      <button id="drawer-close-btn" style="color: var(--text-secondary); padding: 4px;" title="Close Drawer">
+        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+      </button>
+    </div>
+
+    <div class="drawer-messages-list" id="drawer-messages">
+      <!-- Chat bubbles injected dynamically -->
+    </div>
+
+    <div class="drawer-input-area">
+      <div class="drawer-suggestions-pills">
+        <button class="drawer-pill">💡 Why is today higher?</button>
+        <button class="drawer-pill">🍲 Which lunch dishes will peak?</button>
+        <button class="drawer-pill">🌧️ Rain prep advice</button>
+        <button class="drawer-pill">🍚 Rice & Dal requirements</button>
+      </div>
+
+      <div class="drawer-input-wrapper">
+        <input type="text" class="drawer-input-box" id="drawer-input" placeholder="Ask Servo AI about demand, menu, portioning..." />
+        <button class="btn-drawer-send" id="drawer-send-btn" title="Send Message">
+          <i data-lucide="send" style="width: 14px; height: 14px;"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ES6 Modules Script -->
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
