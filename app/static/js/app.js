@@ -5,6 +5,8 @@ import { TelemetrySocket } from './api.js';
 import { TodayView } from './todayView.js';
 import { MenuView } from './menuView.js';
 import { ForecastView } from './forecastView.js';
+import { BatchCsvView } from './batchCsvView.js';
+import { TimetableFoodView } from './timetableFoodView.js';
 import { HistoryView } from './historyView.js';
 import { ProcurementView } from './procurementView.js';
 import { AdminView } from './adminView.js';
@@ -30,6 +32,8 @@ class ServoAIApp {
     const todayEl = document.getElementById('view-today');
     const menuEl = document.getElementById('view-menu');
     const forecastEl = document.getElementById('view-forecast');
+    const batchEl = document.getElementById('view-batch');
+    const ttEl = document.getElementById('view-timetable');
     const historyEl = document.getElementById('view-history');
     const procEl = document.getElementById('view-procurement');
     const adminEl = document.getElementById('view-admin');
@@ -37,6 +41,8 @@ class ServoAIApp {
     this.views.today = new TodayView(todayEl, (prompt) => this.assistantDrawer.open(prompt));
     this.views.menu = new MenuView(menuEl, (prompt) => this.assistantDrawer.open(prompt));
     this.views.forecast = new ForecastView(forecastEl, (prompt) => this.assistantDrawer.open(prompt));
+    this.views.batch = new BatchCsvView(batchEl, (prompt) => this.assistantDrawer.open(prompt));
+    this.views.timetable = new TimetableFoodView(ttEl, (prompt) => this.assistantDrawer.open(prompt));
     this.views.history = new HistoryView(historyEl, () => this.views.today.load());
     this.views.procurement = new ProcurementView(procEl);
     this.views.admin = new AdminView(adminEl, () => {

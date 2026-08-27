@@ -2,13 +2,18 @@
 Servo-AI - SQLAlchemy Database Models
 Defines User, MealDemand, Prediction, FoodWaste, Feedback, DailyRecord, and Operational tables.
 """
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from sqlalchemy import (
     Column, Integer, String, Float, Boolean, Date, DateTime, Text, ForeignKey, JSON
 )
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
+
+
+def utc_now():
+    """Returns timezone-aware UTC datetime"""
+    return datetime.now(timezone.utc)
 
 
 class User(Base):
@@ -19,7 +24,7 @@ class User(Base):
     name = Column(String(128), nullable=False)
     email = Column(String(128), unique=True, index=True, nullable=False)
     role = Column(String(32), default="staff", nullable=False)  # admin, staff, manager
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 class MealDemand(Base):
@@ -38,7 +43,7 @@ class MealDemand(Base):
     is_weekend = Column(Boolean, default=False)
     student_attendance = Column(Integer, default=3500)
     faculty_attendance = Column(Integer, default=380)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 class Prediction(Base):
@@ -53,7 +58,7 @@ class Prediction(Base):
     lower_bound = Column(Float, nullable=False)
     upper_bound = Column(Float, nullable=False)
     confidence = Column(Float, default=0.95)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 class FoodWaste(Base):
@@ -68,7 +73,7 @@ class FoodWaste(Base):
     sold_quantity = Column(Float, nullable=False)
     wasted_quantity = Column(Float, nullable=False)
     waste_percentage = Column(Float, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 class Feedback(Base):
@@ -81,7 +86,7 @@ class Feedback(Base):
     menu_item = Column(String(128), index=True, nullable=False)
     rating = Column(Integer, nullable=False)  # 1 to 5
     comments = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 class DailyRecord(Base):
@@ -131,8 +136,8 @@ class DailyRecord(Base):
     anomaly_flag = Column(Boolean, default=False)
     anomaly_reason = Column(String(256), nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 
 
 class AcademicCalendar(Base):
@@ -170,7 +175,7 @@ class ManagerCorrection(Base):
     adjusted_count = Column(Integer)
     correction_type = Column(String(32))
     reason = Column(String(256))
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 
 class ModelTrainingLog(Base):
@@ -178,7 +183,7 @@ class ModelTrainingLog(Base):
     __tablename__ = "model_training_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    trained_at = Column(DateTime, default=datetime.utcnow)
+    trained_at = Column(DateTime, default=utc_now)
     sample_count = Column(Integer)
     mae = Column(Float)
     rmse = Column(Float)

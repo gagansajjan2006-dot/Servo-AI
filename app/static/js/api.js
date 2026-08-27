@@ -123,6 +123,55 @@ export const API = {
     });
     if (!res.ok) throw new Error(`API error: ${res.statusText}`);
     return res.json();
+  },
+
+  // BATCH CSV PREDICTION ENDPOINTS
+  async uploadBatchCsv(file, bufferPct = 5.0) {
+    const formData = new FormData();
+    if (file instanceof File || file instanceof Blob) {
+      formData.append('file', file, file.name || 'input.csv');
+    } else if (typeof file === 'string') {
+      const blob = new Blob([file], { type: 'text/csv' });
+      formData.append('file', blob, 'forecast_input.csv');
+    } else {
+      throw new Error('Invalid file input for batch CSV');
+    }
+
+    const res = await fetch(`/api/predictions/batch-csv?buffer=${encodeURIComponent(bufferPct)}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: res.statusText }));
+      throw new Error(err.message || err.detail?.message || 'Failed to process batch CSV');
+    }
+    return res.json();
+  },
+
+  async downloadBatchCsv(file, bufferPct = 5.0) {
+    const formData = new FormData();
+    if (file instanceof File || file instanceof Blob) {
+      formData.append('file', file, file.name || 'input.csv');
+    } else if (typeof file === 'string') {
+      const blob = new Blob([file], { type: 'text/csv' });
+      formData.append('file', blob, 'forecast_input.csv');
+    }
+
+    const res = await fetch(`/api/predictions/batch-csv/download?buffer=${encodeURIComponent(bufferPct)}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: res.statusText }));
+      throw new Error(err.message || err.detail?.message || 'Failed to download output CSV');
+    }
+    return res.blob();
+  },
+
+  getSampleCsvUrl() {
+    return '/api/predictions/sample-csv';
   }
 };
 

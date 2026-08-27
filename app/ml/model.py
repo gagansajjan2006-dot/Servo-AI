@@ -30,23 +30,7 @@ class CanteenDemandForecaster:
 
     def load_or_initialize(self):
         """Loads saved models if available, otherwise initializes clean estimators."""
-        candidate_files = [MODEL_FILE, BUNDLED_MODEL_FILE]
-        for fpath in candidate_files:
-            if fpath and fpath.exists():
-                try:
-                    bundle = joblib.load(fpath)
-                    self.model_mean = bundle.get("model_mean")
-                    self.model_lower = bundle.get("model_lower")
-                    self.model_upper = bundle.get("model_upper")
-                    self.feature_importances = bundle.get("feature_importances", {})
-                    self.last_trained = bundle.get("last_trained")
-                    self.metrics = bundle.get("metrics", {})
-                    self._is_fitted = True
-                    return
-                except Exception as e:
-                    print(f"Warning: could not load existing model from {fpath}: {e}")
-                
-        # Default fresh estimators
+        # Initialize default estimators first
         self.model_mean = HistGradientBoostingRegressor(
             loss="squared_error", max_iter=120, max_leaf_nodes=31, random_state=42
         )
@@ -57,6 +41,24 @@ class CanteenDemandForecaster:
             loss="quantile", quantile=0.92, max_iter=100, random_state=42
         )
         self._is_fitted = False
+
+        candidate_files = [MODEL_FILE, BUNDLED_MODEL_FILE]
+        for fpath in candidate_files:
+            if fpath and fpath.exists():
+                try:
+                    bundle = joblib.load(fpath)
+                    if isinstance(bundle, dict) and bundle.get("model_mean") is not None:
+                        self.model_mean = bundle.get("model_mean")
+                        self.model_lower = bundle.get("model_lower", self.model_lower)
+                        self.model_upper = bundle.get("model_upper", self.model_upper)
+                        self.feature_importances = bundle.get("feature_importances", {})
+                        self.last_trained = bundle.get("last_trained")
+                        self.metrics = bundle.get("metrics", {})
+                        self._is_fitted = True
+                        return
+                except Exception as e:
+                    print(f"Warning: could not load existing model from {fpath}: {e}")
+
 
     def train_on_records(self, db: Optional[Session] = None) -> Dict[str, Any]:
         """Fetches historical records from DB, engineers features, trains ensemble and calculates metrics."""

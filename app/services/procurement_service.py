@@ -1,16 +1,27 @@
-"""
-Canteen Pulse - Procurement & Recipe Ratio Service
-Translates predicted meal counts into exact raw ingredient quantities (kg, litres, units) with safety buffers.
-"""
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.database import RecipeRatio
+
+DEFAULT_RECIPE_RATIOS = [
+    {"id": 1, "category": "lunch_dinner", "ingredient_name": "Premium Sona Masoori Rice", "unit": "kg", "qty_per_100_meals": 14.0, "current_unit_price": 58.0, "notes": "Standard 140g per meal"},
+    {"id": 2, "category": "lunch_dinner", "ingredient_name": "Toor Dal & Moong Pulses", "unit": "kg", "qty_per_100_meals": 5.5, "current_unit_price": 145.0, "notes": "55g dry dal per meal"},
+    {"id": 3, "category": "lunch_dinner", "ingredient_name": "Fresh Mixed Vegetables", "unit": "kg", "qty_per_100_meals": 12.0, "current_unit_price": 42.0, "notes": "Seasonal greens, carrots, beans"},
+    {"id": 4, "category": "lunch_dinner", "ingredient_name": "Paneer / Farm Fresh Chicken", "unit": "kg", "qty_per_100_meals": 8.5, "current_unit_price": 280.0, "notes": "High-protein mains"},
+    {"id": 5, "category": "lunch_dinner", "ingredient_name": "Whole Wheat Flour (Atta)", "unit": "kg", "qty_per_100_meals": 7.5, "current_unit_price": 40.0, "notes": "For fresh Phulkas & Rotis"},
+    {"id": 6, "category": "lunch_dinner", "ingredient_name": "Refined Sunflower Oil & Ghee", "unit": "litres", "qty_per_100_meals": 3.2, "current_unit_price": 135.0, "notes": "Cooking medium & seasoning"},
+    {"id": 7, "category": "breakfast", "ingredient_name": "Idli / Dosa Rice & Urad Batter", "unit": "kg", "qty_per_100_meals": 11.0, "current_unit_price": 62.0, "notes": "Fermented batter mix"},
+    {"id": 8, "category": "breakfast", "ingredient_name": "Thick Poha & Semolina", "unit": "kg", "qty_per_100_meals": 6.0, "current_unit_price": 48.0, "notes": "Quick morning staples"},
+    {"id": 9, "category": "snacks", "ingredient_name": "Potatoes & Sweet Onions", "unit": "kg", "qty_per_100_meals": 9.5, "current_unit_price": 32.0, "notes": "Samosa, Vada Pav, Veg Cutlet filling"},
+    {"id": 10, "category": "beverage", "ingredient_name": "Full Cream Dairy Milk", "unit": "litres", "qty_per_100_meals": 14.5, "current_unit_price": 64.0, "notes": "Chai, Filter Coffee & Curd"},
+    {"id": 11, "category": "beverage", "ingredient_name": "Assam CTC Tea & Cardamom", "unit": "kg", "qty_per_100_meals": 1.2, "current_unit_price": 360.0, "notes": "Ginger Masala & Strong Chai"},
+    {"id": 12, "category": "beverage", "ingredient_name": "Ground Robusta Coffee Beans", "unit": "kg", "qty_per_100_meals": 0.8, "current_unit_price": 520.0, "notes": "South Indian Filter Brew"}
+]
 
 class ProcurementService:
     def calculate_procurement_for_meals(
         self,
-        db: Session,
-        station_counts: Dict[str, int],
+        db: Optional[Session] = None,
+        station_counts: Optional[Dict[str, int]] = None,
         safety_buffer_pct: float = 5.0
     ) -> Dict[str, Any]:
         """
@@ -26,7 +37,8 @@ class ProcurementService:
         
         buffer_mult = 1.0 + (safety_buffer_pct / 100.0)
         
-        ratios = db.query(RecipeRatio).all()
+        db_ratios = db.query(RecipeRatio).all() if db else []
+        ratios = db_ratios if db_ratios else [type('RecipeObj', (), r)() for r in DEFAULT_RECIPE_RATIOS]
         
         items = []
         total_estimated_cost = 0.0

@@ -65,6 +65,14 @@
           <i data-lucide="calendar"></i>
           <span>14-Day Outlook</span>
         </button>
+        <button class="nav-tab-btn" data-view="batch" id="tab-batch">
+          <i data-lucide="file-spreadsheet"></i>
+          <span>CSV Forecast</span>
+        </button>
+        <button class="nav-tab-btn" data-view="timetable" id="tab-timetable">
+          <i data-lucide="clock"></i>
+          <span>Timetable Food Plan</span>
+        </button>
         <button class="nav-tab-btn" data-view="history" id="tab-history">
           <i data-lucide="bar-chart-3"></i>
           <span>History & Accuracy</span>
@@ -109,13 +117,19 @@
       <!-- 3. 14-DAY FORECAST OUTLOOK VIEW -->
       <section id="view-forecast" class="view-section"></section>
 
-      <!-- 4. HISTORY & ACCURACY SCOREBOARD VIEW -->
+      <!-- 4. BATCH CSV FORECAST & PROCUREMENT STUDIO -->
+      <section id="view-batch" class="view-section"></section>
+
+      <!-- 5. TIMETABLE FOOD PLANNER & SCHEDULE STUDIO -->
+      <section id="view-timetable" class="view-section"></section>
+
+      <!-- 6. HISTORY & ACCURACY SCOREBOARD VIEW -->
       <section id="view-history" class="view-section"></section>
 
-      <!-- 5. PROCUREMENT & RECIPE MATRIX VIEW -->
+      <!-- 7. PROCUREMENT & RECIPE MATRIX VIEW -->
       <section id="view-procurement" class="view-section"></section>
 
-      <!-- 6. ADMIN & RETRAIN WORKBENCH VIEW -->
+      <!-- 8. ADMIN & RETRAIN WORKBENCH VIEW -->
       <section id="view-admin" class="view-section"></section>
     </main>
 
@@ -142,6 +156,14 @@
       <button class="mobile-nav-item" data-view="forecast" id="mob-nav-forecast">
         <i data-lucide="calendar"></i>
         <span>Outlook</span>
+      </button>
+      <button class="mobile-nav-item" data-view="timetable" id="mob-nav-timetable">
+        <i data-lucide="clock"></i>
+        <span>Timetable</span>
+      </button>
+      <button class="mobile-nav-item" data-view="batch" id="mob-nav-batch">
+        <i data-lucide="file-spreadsheet"></i>
+        <span>CSV</span>
       </button>
       <button class="mobile-nav-item" data-view="history" id="mob-nav-history">
         <i data-lucide="bar-chart-3"></i>
