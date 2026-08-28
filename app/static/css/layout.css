@@ -86,6 +86,13 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nav-tabs-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-tab-btn {
@@ -98,7 +105,11 @@
   color: var(--text-secondary);
   position: relative;
   transition: color var(--transition-fast);
-  background: transparent !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
   box-shadow: none !important;
 }
 
@@ -256,9 +267,16 @@ body.ambient-kitchen-mode .hero-giant-number {
   background-color: rgba(24, 22, 19, 0.96);
   border-top: 1px solid var(--border-subtle);
   padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) 12px;
-  justify-content: space-around;
+  justify-content: flex-start;
   align-items: center;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-bottom-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .mobile-nav-item {
@@ -275,7 +293,8 @@ body.ambient-kitchen-mode .hero-giant-number {
   transition: all var(--transition-fast);
   background: none;
   border: none;
-  min-width: 58px;
+  min-width: 65px;
+  flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
 }
 

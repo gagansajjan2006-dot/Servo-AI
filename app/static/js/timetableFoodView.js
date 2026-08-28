@@ -450,21 +450,21 @@ export class TimetableFoodView {
 
         <!-- DROPZONE -->
         <div class="csv-dropzone" id="tt-csv-dropzone" style="padding: 24px 20px;">
-          <input type="file" id="tt-file-input" accept=".csv,text/csv" style="display:none;" />
+          <input type="file" id="tt-file-input" accept=".csv,text/csv,.pdf" style="display:none;" />
           <div class="dropzone-inner">
             <div class="dropzone-icon-wrap" style="width:52px; height:52px; margin-bottom:10px;">
               <i data-lucide="calendar-clock" style="width:28px; height:28px; color:var(--accent-copper);"></i>
             </div>
             <div style="font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">
-              Drop your College Timetable CSV here
+              Drop your College Timetable (CSV/PDF) here
             </div>
             <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
-              Client-side instant parsing (no backend upload needed)
+              CSV parsing is client-side. PDFs will be securely parsed.
             </div>
 
             <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
               <button class="btn-primary" id="btn-browse-tt-file" style="padding:6px 16px; font-size:12px;">
-                <i data-lucide="folder-open" style="width:13px; height:13px;"></i> Select Timetable CSV
+                <i data-lucide="folder-open" style="width:13px; height:13px;"></i> Select Timetable CSV/PDF
               </button>
               <button class="btn-secondary" id="btn-load-demo-tt" style="padding:6px 16px; font-size:12px;">
                 <i data-lucide="sparkles" style="width:13px; height:13px; color:var(--accent-copper);"></i> Load Engineering Demo Schedule
@@ -840,8 +840,42 @@ export class TimetableFoodView {
   }
 
   readFile(file) {
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      const dropzone = this.container.querySelector('#tt-csv-dropzone');
+      if (dropzone) dropzone.style.opacity = '0.5';
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      fetch('/api/timetable/upload-pdf', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (dropzone) dropzone.style.opacity = '1';
+        if (!data.success && !data.csv_text) {
+          alert('Failed to extract table from PDF: ' + (data.detail || data.message || 'Unknown error'));
+          return;
+        }
+        const parsed = this.parseCSV(data.csv_text);
+        if (!parsed.length) {
+          alert('Could not parse any rows from the PDF timetable. Please check formatting.');
+          return;
+        }
+        this.timetableData = parsed;
+        this.computeFoodPlan();
+        this.render();
+      })
+      .catch(err => {
+        if (dropzone) dropzone.style.opacity = '1';
+        alert(`Failed to upload PDF: ${err.message}`);
+      });
+      return;
+    }
+
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      alert('Please select a valid .csv timetable file.');
+      alert('Please select a valid .csv or .pdf timetable file.');
       return;
     }
     const reader = new FileReader();

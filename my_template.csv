@@ -1,0 +1,15 @@
+date,temperature_c,rainfall_mm,humidity_pct,is_holiday,is_exam,is_special,rolling_avg_7d,rolling_avg_28d,notes
+2026-09-01,29.5,0.0,52,0,0,0,410,405,Regular Tuesday - Standard classes
+2026-09-02,30.0,0.0,50,0,0,0,412,406,Regular Wednesday - Full attendance
+2026-09-03,26.0,18.5,85,0,0,0,408,405,Heavy Monsoon Storm - Expect hot snack spike
+2026-09-04,27.5,6.0,78,0,0,0,395,402,Friday Afternoon - Pre-weekend taper
+2026-09-05,28.0,0.0,60,0,0,0,240,380,Saturday - Hostel and weekend diners
+2026-09-06,29.0,0.0,55,0,0,0,180,375,Sunday - Low campus headcount
+2026-09-07,28.5,0.0,58,0,1,0,425,410,Monday - Midterm Exam Week Begins (+15% surge)
+2026-09-08,27.0,12.0,80,0,1,0,435,412,Tuesday - Midterms + Rainy afternoon
+2026-09-09,28.0,0.0,62,0,1,0,440,415,Wednesday - Midterms Peak study sessions
+2026-09-10,29.0,0.0,55,0,1,0,430,414,Thursday - Midterms final review
+2026-09-11,28.0,0.0,58,0,0,1,460,420,Friday - Annual Campus Cultural Fest (+35% rush)
+2026-09-12,27.5,0.0,60,0,0,1,380,418,Saturday - Cultural Fest Day 2 Visitors
+2026-09-13,29.0,0.0,50,1,0,0,95,390,Sunday - National Holiday / Campus Closed
+2026-09-14,28.5,0.0,55,0,0,0,415,408,Monday - Regular Academic Week Restart

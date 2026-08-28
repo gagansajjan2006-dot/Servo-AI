@@ -149,6 +149,7 @@ from app.routes.analytics import router as analytics_router
 from app.routes.recommendations import router as recommendations_router
 from app.routes.ml import router as ml_router
 from app.routes.settings import router as settings_router
+from app.routes.timetable import router as timetable_router
 
 app.include_router(dashboard_router)
 app.include_router(health_router)
@@ -160,6 +161,7 @@ app.include_router(analytics_router)
 app.include_router(recommendations_router)
 app.include_router(ml_router)
 app.include_router(settings_router)
+app.include_router(timetable_router)
 
 
 
